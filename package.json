@@ -1,0 +1,23 @@
+{
+  "name": "hardhat-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.1.0",
+    "chai": "^4.3.4",
+    "erc721a": "^4.2.2",
+    "ethereum-waffle": "^3.3.0",
+    "hardhat": "^2.2.1",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.32"
+  },
+  "scripts": {
+    "test": "npx hardhat clean && npx hardhat compile && mocha"
+  },
+  "author": "",
+  "license": "ISC"
+}
