@@ -41,6 +41,22 @@ describe("test everything", function() {
 		// (owner) set root
 		await ScuffedFemboys1.connect(owner).setClaimRoot(rootHash);
 		
+		// (addr2) tries to mint when sale not started - fail
+		{
+			let address = addr2raw; // uses addr3's hashes for addr2
+			let hashedAddress = keccak256(address);
+			let proof = merkleTree.getHexProof(hashedAddress);
+			await expect(ScuffedFemboys1.connect(addr2).claim(proof)).to.be.revertedWith('Mint has not started');
+		}
+		
+		// (addr2) tries to buy when sale not started - fail
+		{
+			await expect(ScuffedFemboys1.connect(addr2).buy(0, {value: hre.ethers.utils.parseEther("0.05")})).to.be.revertedWith('Mint has not started');
+		}
+
+		// start sale
+		await ScuffedFemboys1.connect(owner).setMintingStatus(true);
+
 		// (addr2) mint a free pair with bad verification - fail
 		{
 			let address = addr3raw; // uses addr3's hashes for addr2

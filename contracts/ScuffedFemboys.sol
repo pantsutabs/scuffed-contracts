@@ -13,6 +13,8 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     string public baseURI;
 
     // Mint params
+    bool public mintStatus = false;
+
     address public saleReceiver; // sale receiver is also the royalty receiver
     uint256 public buyPrice = 0.05 ether;
     uint256 public maxScuffies4Sale;
@@ -25,10 +27,24 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     mapping(address => bool) public claimedAddresses;
 
     constructor(string memory name_, string memory symbol_, uint256 maxSupplySale, uint256 maxSupplyClaim, address saleReceiver_) Ownable() ERC721(name_, symbol_) {
-        saleReceiver = saleReceiver_;
-        _setDefaultRoyalty(saleReceiver, 400); // 4%
         maxScuffies4Sale = maxSupplySale;
         maxScuffies4Claim = maxSupplyClaim;
+        saleReceiver = saleReceiver_;
+        _setDefaultRoyalty(saleReceiver, 400); // 4%
+    }
+
+    modifier mintStarted() {
+        require(mintStatus == true, "Mint has not started");
+        _;
+    }
+    
+    function setMintingStatus(bool mintStatus_) public onlyOwner {
+        mintStatus = mintStatus_;
+    }
+    
+    function setDefaultRoyalty(address saleReceiver_, uint96 feeNumerator) public onlyOwner {
+        saleReceiver = saleReceiver_;
+        _setDefaultRoyalty(saleReceiver, feeNumerator);
     }
 
     function setBaseURI(string memory newURI) public onlyOwner {
@@ -45,7 +61,7 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     }
 
     // Claim free pair
-    function claim(bytes32[] calldata _merkleProof) external nonReentrant {
+    function claim(bytes32[] calldata _merkleProof) external nonReentrant mintStarted {
         require(claimedAddresses[msg.sender] == false, "Claimed already");
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         require(MerkleProof.verify(_merkleProof, claimRoot, leaf), "Incorrect proof");
@@ -61,7 +77,7 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     }
 
     // Buy 1-100
-    function buy(uint256 count) external nonReentrant payable  {
+    function buy(uint256 count) external nonReentrant mintStarted payable  {
         require(count > 0, "Cannot mint 0");
         require(count <= 100, "What are you doing");
         require(scuffiesSold + count <= maxScuffies4Sale, "Not enough left for sale");
