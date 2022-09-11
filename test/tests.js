@@ -65,6 +65,9 @@ describe("test everything", function() {
 			await expect(ScuffedFemboys1.connect(addr2).claim(proof)).to.be.revertedWith('Incorrect proof');
 		}
 
+		// (addr2) check that can still claim
+		await expect(await ScuffedFemboys1.connect(addr2).alreadyClaimed(addr2raw)).to.equal(false);
+
 		// (addr2) mint a free pair with good verification - success
 		{
 			let address = addr2raw;
@@ -72,6 +75,9 @@ describe("test everything", function() {
 			let proof = merkleTree.getHexProof(hashedAddress);
 			await ScuffedFemboys1.connect(addr2).claim(proof);
 		}
+
+		// (addr2) check that already claimed
+		await expect(await ScuffedFemboys1.connect(addr2).alreadyClaimed(addr2raw)).to.equal(true);
 
 		// (addr2) try to repeat the previous - (already claimed) - fail
 		{
@@ -113,6 +119,9 @@ describe("test everything", function() {
 
 		// (addr5) buy one - with accurate money - success
 		await ScuffedFemboys1.connect(addr5).buy(1, {value: hre.ethers.utils.parseEther("0.05")});
+		
+		// (addr6) try to buy more than there are left (3) - fail
+		await expect(ScuffedFemboys1.connect(addr5).buy(3, {value: hre.ethers.utils.parseEther("0.15")})).to.be.revertedWith('Not enough left for sale');
 
 		// (addr6) buy the remaining 2 together - success
 		await ScuffedFemboys1.connect(addr6).buy(2, {value: hre.ethers.utils.parseEther("0.1")});
@@ -157,5 +166,9 @@ describe("test everything", function() {
 
 		// check that the eth is received into (addr1)
 		expect(hre.ethers.utils.formatEther((await provider.getBalance(addr1raw)))).to.equal('10000.15');
+
+		// some sanity checks
+		await expect(await ScuffedFemboys1.connect(addr5).scuffiesSold()).to.equal(3);
+		await expect(await ScuffedFemboys1.connect(addr5).scuffiesClaimed()).to.equal(4);
   	});
 });

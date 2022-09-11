@@ -59,10 +59,14 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     function setClaimRoot(bytes32 newClaimRoot) public onlyOwner {
         claimRoot = newClaimRoot;
     }
+    
+    function alreadyClaimed(address claimer) public view virtual returns (bool) {
+        return claimedAddresses[claimer];
+    }
 
     // Claim free pair
     function claim(bytes32[] calldata _merkleProof) external nonReentrant mintStarted {
-        require(claimedAddresses[msg.sender] == false, "Claimed already");
+        require(alreadyClaimed(msg.sender) == false, "Claimed already");
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         require(MerkleProof.verify(_merkleProof, claimRoot, leaf), "Incorrect proof");
         require(scuffiesClaimed + scuffiesClaimCount <= maxScuffies4Claim, "Not enough left to claim");
