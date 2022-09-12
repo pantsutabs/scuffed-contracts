@@ -7,19 +7,20 @@
 const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
-
-  const lockedAmount = hre.ethers.utils.parseEther("1");
-
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
+  const PaymentSplitter = await hre.ethers.getContractFactory("PaymentSplitter");
+  const PaymentSplitter1 = await PaymentSplitter.deploy([addr1raw],[50]);
+  await PaymentSplitter1.deployed();
+  
+  const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
+  const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 100, 10, PaymentSplitter1.address);
+  await ScuffedFemboys1.deployed();
+  
+  console.log(
+    `Payment splitter deployed to ${PaymentSplitter1.address}`
+  );
 
   console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+    `Scuffed femboys deployed to ${ScuffedFemboys1.address}`
   );
 }
 
