@@ -46,6 +46,9 @@ describe("test state cycle", function () {
 		// (owner) set root
 		await ScuffedFemboys1.connect(owner).setClaimRoot(rootHash);
 
+		// check max supply
+		await expect(await ScuffedFemboys1.connect(addr5).maxSupply()).to.equal(7);
+
 		// (addr2) tries to mint when sale not started - fail
 		{
 			let address = addr2raw; // uses addr3's hashes for addr2
