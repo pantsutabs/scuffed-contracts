@@ -7,9 +7,17 @@
 const hre = require("hardhat");
 
 async function main() {
+  const [deployer] = await ethers.getSigners();
+  
+  console.log("Deploying contracts with the account:", deployer.address);
+
+  console.log("Account balance:", (await deployer.getBalance()).toString());
+
   const PaymentSplitter = await hre.ethers.getContractFactory("PaymentSplitter");
-  const PaymentSplitter1 = await PaymentSplitter.deploy([addr1raw],[50]);
+  const PaymentSplitter1 = await PaymentSplitter.deploy([deployer.address],[100]);
   await PaymentSplitter1.deployed();
+
+  await new Promise(r => setTimeout(r, 60000));
   
   const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
   const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 100, 10, PaymentSplitter1.address);

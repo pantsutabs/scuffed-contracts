@@ -16,7 +16,10 @@
     "merkletreejs": "^0.2.32"
   },
   "scripts": {
-    "test": "npx hardhat clean && npx hardhat compile && mocha"
+    "test": "npx hardhat clean && npx hardhat compile && mocha",
+    "deploy-polygon":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/deploy_test.js --network polygon",
+    "deployment-tests-1":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/deploy_tests_1.js --network polygon",
+    "deployment-tests-2":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/deploy_tests_2.js --network polygon"
   },
   "author": "",
   "license": "ISC"
