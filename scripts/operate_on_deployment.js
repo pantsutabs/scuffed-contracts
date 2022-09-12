@@ -8,13 +8,16 @@ const hre = require("hardhat");
 
 async function main() {
   const [deployer] = await ethers.getSigners();
-
-  const PaymentSplitter = await hre.ethers.getContractFactory("PaymentSplitter");
-  const PaymentSplitter1 = await PaymentSplitter.attach('0x1C8dD4c50bA22ddA279F886DbF0Bd3Ee5B651526');
   
   const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
+  const ScuffedFemboys1 = await ScuffedFemboys.attach('0xA8543C6ecf3C8595Aa0755dA7236F18eFDC1a38b');
+
+  const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
   const ScuffedFemboys1 = await ScuffedFemboys.attach('0xde65e8C956C8A82eaE92c056Dd3c17A228048F17');
-  
+
+  //await ScuffedFemboys1.connect(deployer).setMintingStatus(true);
+
+  await ScuffedFemboys1.connect(deployer).buy(1, { value: hre.ethers.utils.parseEther("0.05") });
 }
 
 // We recommend this pattern to be able to use async/await everywhere

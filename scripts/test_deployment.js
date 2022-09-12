@@ -12,6 +12,9 @@ async function main() {
   const PaymentSplitter = await hre.ethers.getContractFactory("PaymentSplitter");
   const PaymentSplitter1 = await PaymentSplitter.attach('0x16ce69f3fe7c52aa0fb25543a0ffd404bfddb8f2');
   
+  const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
+  const ScuffedFemboys1 = await ScuffedFemboys.attach('0xde65e8C956C8A82eaE92c056Dd3c17A228048F17');
+  
   console.log(await PaymentSplitter1.connect(deployer).payee(0));
 }
 
