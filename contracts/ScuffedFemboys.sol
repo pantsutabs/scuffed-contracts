@@ -60,6 +60,10 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     function setClaimRoot(bytes32 newClaimRoot) public onlyOwner {
         claimRoot = newClaimRoot;
     }
+
+    function maxSupply() public view virtual returns (uint256) {
+        return maxScuffies4Sale + maxScuffies4Claim;
+    }
     
     function alreadyClaimed(address claimer) public view virtual returns (bool) {
         return claimedAddresses[claimer];
