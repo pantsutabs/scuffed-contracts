@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
+import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 
 contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  {
 
