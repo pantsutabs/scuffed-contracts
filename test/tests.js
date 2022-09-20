@@ -144,13 +144,13 @@ describe("test state cycle", function () {
 		await expect(ScuffedFemboys1.connect(addr2).buy(1, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Not enough left for sale');
 
 		// (addr6) transfer id:5 to addr5 - success
-		await ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr5raw, 5);
+		await ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr5raw, 6);
 
 		// (addr6) transfer id:5 to addr2 - (doesn't own) - fail
-		await expect(ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr2raw, 5)).to.be.revertedWith('ERC721: caller is not token owner nor approved');
+		await expect(ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr2raw, 6)).to.be.revertedWith('ERC721: caller is not token owner nor approved');
 
 		// (addr6) transfer id:3 to addr5 - (doesn't own) - fail
-		await expect(ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr5raw, 3)).to.be.revertedWith('ERC721: caller is not token owner nor approved');
+		await expect(ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr5raw, 4)).to.be.revertedWith('ERC721: caller is not token owner nor approved');
 
 		// check balances, addr2 - 2, addr3 - 2, addr4 - 0, addr5 - 2, addr6 - 1
 		await expect(await ScuffedFemboys1.balanceOf(addr2raw)).to.equal(hre.ethers.BigNumber.from("2"));

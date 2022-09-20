@@ -96,10 +96,13 @@ async function main() {
   //await ScuffedFemboys1.connect(deployer).setMintingStatus(true);
 
   // Set a root
-  {
+  /* {
     //console.log(merkleTree.toString());
     await ScuffedFemboys1.connect(deployer).setClaimRoot(await getRootFromClaimlist()); //rootHash
-  }
+  } */
+
+  //await ScuffedFemboys1.connect(deployer).withdrawETH();
+  await PaymentSplitter1.connect(deployer)['release(address)'](deployer.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -12,12 +12,13 @@ import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  {
 
     string public baseURI;
+    uint256 public tokenIdStartFrom = 1;
 
     // Mint params
     bool public mintStatus = false;
 
     address public saleReceiver; // sale receiver is also the royalty receiver
-    uint256 public buyPrice = 0.05 ether;
+    uint256 public buyPrice = 0.04 ether;
     uint256 public maxScuffies4Sale;
     uint256 public scuffiesSold = 0;
 
@@ -81,7 +82,7 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
 
         uint supply = totalSupply();
         for (uint256 i = 0; i < scuffiesClaimCount; i++) {
-            _safeMint(msg.sender, supply + i);
+            _safeMint(msg.sender, tokenIdStartFrom + supply + i);
         }
     }
 
@@ -96,7 +97,7 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
 
         uint supply = totalSupply();
         for (uint256 i = 0; i < count; i++) {
-            _safeMint(msg.sender, supply + i);
+            _safeMint(msg.sender, tokenIdStartFrom + supply + i);
         }
     }
 
