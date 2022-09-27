@@ -8,10 +8,11 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
+import "./ITokenDataProvider.sol";
 
 contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  {
 
-    string public baseURI;
+    address public tokenDataProvider;
     uint256 public tokenIdStartFrom = 1;
 
     // Mint params
@@ -28,11 +29,12 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
     bytes32 public claimRoot;
     mapping(address => bool) public claimedAddresses;
 
-    constructor(string memory name_, string memory symbol_, uint256 maxSupplySale, uint256 maxSupplyClaim, address saleReceiver_) Ownable() ERC721(name_, symbol_) {
+    constructor(string memory name_, string memory symbol_, uint256 maxSupplySale, uint256 maxSupplyClaim, address saleReceiver_, address tokenDataProvider_) Ownable() ERC721(name_, symbol_) {
         maxScuffies4Sale = maxSupplySale;
         maxScuffies4Claim = maxSupplyClaim;
         saleReceiver = saleReceiver_;
         _setDefaultRoyalty(saleReceiver, 400); // 4%
+        tokenDataProvider = tokenDataProvider_;
     }
 
     modifier mintStarted() {
@@ -49,13 +51,11 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
         _setDefaultRoyalty(saleReceiver, feeNumerator);
     }
 
-    function setBaseURI(string memory newURI) public onlyOwner {
-        baseURI = newURI;
-    }
-
     // Overwrite
-    function _baseURI() internal view virtual override returns (string memory) {
-        return baseURI;
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        _requireMinted(tokenId);
+
+        return ITokenDataProvider(tokenDataProvider).tokenURI(tokenId);
     }
     
     function setClaimRoot(bytes32 newClaimRoot) public onlyOwner {

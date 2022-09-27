@@ -22,9 +22,13 @@ describe("test state cycle", function () {
 		const PaymentSplitter = await hre.ethers.getContractFactory("PaymentSplitter");
 		const PaymentSplitter1 = await PaymentSplitter.deploy([addr1raw, addr7raw],[50,50]);
 		await PaymentSplitter1.deployed();
+
+		const BasicTokenDataProvider = await hre.ethers.getContractFactory("BasicTokenDataProvider");
+		const BasicTokenDataProvider1 = await BasicTokenDataProvider.deploy();
+		await BasicTokenDataProvider1.deployed();
 		
 		const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
-		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 3, 4, PaymentSplitter1.address);
+		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 3, 4, PaymentSplitter1.address, BasicTokenDataProvider1.address);
 		await ScuffedFemboys1.deployed();
 
 		// Set up the merkle tree
@@ -59,7 +63,7 @@ describe("test state cycle", function () {
 
 		// (addr2) tries to buy when sale not started - fail
 		{
-			await expect(ScuffedFemboys1.connect(addr2).buy(0, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Mint has not started');
+			await expect(ScuffedFemboys1.connect(addr2).buy(0, { value: hre.ethers.utils.parseEther("0.04") })).to.be.revertedWith('Mint has not started');
 		}
 
 		// start sale
@@ -121,27 +125,27 @@ describe("test state cycle", function () {
 		await expect(ScuffedFemboys1.connect(addr5).buy(1, { value: hre.ethers.utils.parseEther("1.06") })).to.be.revertedWith('Wrong ETH sum sent');
 
 		// (addr5) buy 0 or too many - fail
-		await expect(ScuffedFemboys1.connect(addr5).buy(0, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Cannot mint 0');
+		await expect(ScuffedFemboys1.connect(addr5).buy(0, { value: hre.ethers.utils.parseEther("0.04") })).to.be.revertedWith('Cannot mint 0');
 		await expect(ScuffedFemboys1.connect(addr5).buy(0, { value: hre.ethers.utils.parseEther("0.00") })).to.be.revertedWith('Cannot mint 0');
 		await expect(ScuffedFemboys1.connect(addr5).buy(150, { value: hre.ethers.utils.parseEther("7.5") })).to.be.revertedWith('What are you doing');
 
 		// (addr5) buy one - with accurate money - success
-		await ScuffedFemboys1.connect(addr5).buy(1, { value: hre.ethers.utils.parseEther("0.05") });
+		await ScuffedFemboys1.connect(addr5).buy(1, { value: hre.ethers.utils.parseEther("0.04") });
 
 		// (addr6) try to buy more than there are left (3) - fail
 		await expect(ScuffedFemboys1.connect(addr5).buy(3, { value: hre.ethers.utils.parseEther("0.15") })).to.be.revertedWith('Not enough left for sale');
 
 		// (addr6) buy the remaining 2 together - success
-		await ScuffedFemboys1.connect(addr6).buy(2, { value: hre.ethers.utils.parseEther("0.1") });
+		await ScuffedFemboys1.connect(addr6).buy(2, { value: hre.ethers.utils.parseEther("0.08") });
 
 		// (addr5) buy one - with accurate money - (no mints left) - fail
-		await expect(ScuffedFemboys1.connect(addr5).buy(1, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Not enough left for sale');
+		await expect(ScuffedFemboys1.connect(addr5).buy(1, { value: hre.ethers.utils.parseEther("0.04") })).to.be.revertedWith('Not enough left for sale');
 
 		// (addr6) buy one - with accurate money - (no mints left) - fail
-		await expect(ScuffedFemboys1.connect(addr6).buy(1, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Not enough left for sale');
+		await expect(ScuffedFemboys1.connect(addr6).buy(1, { value: hre.ethers.utils.parseEther("0.04") })).to.be.revertedWith('Not enough left for sale');
 
 		// (addr2) buy one - with accurate money - (no mints left) - fail
-		await expect(ScuffedFemboys1.connect(addr2).buy(1, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Not enough left for sale');
+		await expect(ScuffedFemboys1.connect(addr2).buy(1, { value: hre.ethers.utils.parseEther("0.04") })).to.be.revertedWith('Not enough left for sale');
 
 		// (addr6) transfer id:5 to addr5 - success
 		await ScuffedFemboys1.connect(addr6).transferFrom(addr6raw, addr5raw, 6);
@@ -161,10 +165,10 @@ describe("test state cycle", function () {
 
 		// Non owner tries to set restricted parameters
 		await expect(ScuffedFemboys1.connect(addr3).setClaimRoot(rootHash)).to.be.revertedWith('Ownable: caller is not the owner');
-		await expect(ScuffedFemboys1.connect(addr3).setBaseURI("ipfs://testtesttest/")).to.be.revertedWith('Ownable: caller is not the owner');
+		await expect(BasicTokenDataProvider1.connect(addr3).setBaseURI("ipfs://testtesttest/")).to.be.revertedWith('Ownable: caller is not the owner');
 
 		// set URI
-		await ScuffedFemboys1.connect(owner).setBaseURI("ipfs://testtesttest/");
+		await BasicTokenDataProvider1.connect(owner).setBaseURI("ipfs://testtesttest/");
 
 		// check the get URI that it works
 		await expect(await ScuffedFemboys1.connect(addr5).tokenURI(1)).to.equal("ipfs://testtesttest/1");
@@ -173,7 +177,7 @@ describe("test state cycle", function () {
 		await ScuffedFemboys1.connect(addr5).withdrawETH();
 
 		// check that the eth is received into (addr1)
-		expect(hre.ethers.utils.formatEther((await provider.getBalance(PaymentSplitter1.address)))).to.equal('0.15');
+		expect(hre.ethers.utils.formatEther((await provider.getBalance(PaymentSplitter1.address)))).to.equal('0.12');
 
 		// Try to pay addresses that aren't in the splitter
 		await expect(PaymentSplitter1.connect(addr5)['release(address)'](addrOwner)).to.be.revertedWith('PaymentSplitter: account has no shares');
@@ -185,8 +189,8 @@ describe("test state cycle", function () {
 		await PaymentSplitter1.connect(addr5)['release(address)'](addr7raw);
 
 		// Check payment splitter payee balances
-		expect(hre.ethers.utils.formatEther((await provider.getBalance(addr1raw)))).to.equal('10000.075');
-		expect(hre.ethers.utils.formatEther((await provider.getBalance(addr7raw)))).to.equal('10000.075');
+		expect(hre.ethers.utils.formatEther((await provider.getBalance(addr1raw)))).to.equal('10000.06');
+		expect(hre.ethers.utils.formatEther((await provider.getBalance(addr7raw)))).to.equal('10000.06');
 
 		// some sanity checks
 		await expect(await ScuffedFemboys1.connect(addr5).scuffiesSold()).to.equal(3);
@@ -207,7 +211,7 @@ describe("test claims without root", function () {
 		const addr5raw = await addr5.getAddress(); // normal buyer
 		const addr6raw = await addr6.getAddress(); // normal buyer
 		const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
-		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 3, 4, addr1raw);
+		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 3, 4, addr1raw, addr1raw);
 
 		await ScuffedFemboys1.deployed();
 
@@ -254,7 +258,7 @@ describe("test claims without root", function () {
 
 		// (addr2) tries to buy when sale not started - fail
 		{
-			await expect(ScuffedFemboys1.connect(addr2).buy(0, { value: hre.ethers.utils.parseEther("0.05") })).to.be.revertedWith('Mint has not started');
+			await expect(ScuffedFemboys1.connect(addr2).buy(0, { value: hre.ethers.utils.parseEther("0.04") })).to.be.revertedWith('Mint has not started');
 		}
 
 		// start sale
