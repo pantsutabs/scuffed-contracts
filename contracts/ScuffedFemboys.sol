@@ -51,6 +51,10 @@ contract ScuffedFemboys is ERC721Enumerable, Ownable, ReentrancyGuard, ERC2981  
         _setDefaultRoyalty(saleReceiver, feeNumerator);
     }
 
+    function setTokenDataProvider(address tokenDataProvider_) public onlyOwner {
+        tokenDataProvider = tokenDataProvider_;
+    }
+
     // Overwrite
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         _requireMinted(tokenId);

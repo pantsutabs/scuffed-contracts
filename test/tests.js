@@ -24,11 +24,14 @@ describe("test state cycle", function () {
 		await PaymentSplitter1.deployed();
 
 		const BasicTokenDataProvider = await hre.ethers.getContractFactory("BasicTokenDataProvider");
-		const BasicTokenDataProvider1 = await BasicTokenDataProvider.deploy();
+		const BasicTokenDataProvider1 = await BasicTokenDataProvider.deploy("test1/");
 		await BasicTokenDataProvider1.deployed();
 		
+		const BasicTokenDataProvider2 = await BasicTokenDataProvider.deploy("test2/");
+		await BasicTokenDataProvider2.deployed();
+		
 		const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
-		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 3, 4, PaymentSplitter1.address, BasicTokenDataProvider1.address);
+		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFF", 3, 4, PaymentSplitter1.address, BasicTokenDataProvider1.address);
 		await ScuffedFemboys1.deployed();
 
 		// Set up the merkle tree
@@ -172,6 +175,12 @@ describe("test state cycle", function () {
 
 		// check the get URI that it works
 		await expect(await ScuffedFemboys1.connect(addr5).tokenURI(1)).to.equal("ipfs://testtesttest/1");
+		
+		// Swap token providers
+		await ScuffedFemboys1.connect(owner).setTokenDataProvider(BasicTokenDataProvider2.address);
+
+		// check the get URI that it works (alternative token provider)
+		await expect(await ScuffedFemboys1.connect(addr5).tokenURI(1)).to.equal("test2/1");
 
 		// (addr5) call withdraw ETH
 		await ScuffedFemboys1.connect(addr5).withdrawETH();
@@ -211,7 +220,7 @@ describe("test claims without root", function () {
 		const addr5raw = await addr5.getAddress(); // normal buyer
 		const addr6raw = await addr6.getAddress(); // normal buyer
 		const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
-		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFFED", 3, 4, addr1raw, addr1raw);
+		const ScuffedFemboys1 = await ScuffedFemboys.deploy("Scuffed Femboys", "SCUFF", 3, 4, addr1raw, addr1raw);
 
 		await ScuffedFemboys1.deployed();
 

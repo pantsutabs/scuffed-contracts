@@ -11,7 +11,8 @@ contract BasicTokenDataProvider is Ownable, ITokenDataProvider  {
 
     string public baseURI = '';
 
-    constructor() Ownable() {
+    constructor(string memory newURI_) Ownable() {
+        baseURI = newURI_;
     }
 
     function setBaseURI(string memory newURI_) public onlyOwner {
