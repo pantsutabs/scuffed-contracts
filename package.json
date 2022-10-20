@@ -17,7 +17,12 @@
   },
   "scripts": {
     "test": "npx hardhat clean && npx hardhat compile && mocha",
-    "deploy-polygon":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/deploy_test.js --network polygon",
+    
+    "0-deploy":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/0_deploy.js --network mainnet",
+    "1-setBaseRoot":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/1_setBaseRoot.js --network mainnet",
+    "2-enableMinting":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/2_enableMinting.js --network mainnet",
+
+    "deploy-polygon":"npx hardhat clean && npx hardhat compile && npx hardhat run scripts/deploy_for_testing.js --network polygon",
     "deploy-operation":"npx hardhat run scripts/operate_on_deployment.js --network polygon",
     "test-deployment":"npx hardhat run scripts/test_deployment.js --network polygon"
   },

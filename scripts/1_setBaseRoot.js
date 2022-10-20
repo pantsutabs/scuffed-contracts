@@ -9,20 +9,12 @@ const { MerkleTree } = require("merkletreejs")
 const keccak256 = require("keccak256")
 const fs = require('fs').promises;
 
+// TODO: copy paste latest one from the merkle script
 async function getRootFromClaimlist() {
   let addysStr = '';
   let preppedAddresToProof = { root: null, address: {} };
 
   addysStr = await fs.readFile("./claimlist.txt", "utf-8");
-
-  // Test addys
-  {
-    addysStr =
-`0x16ce69f3fe7c52aa0fb25543a0ffd404bfddb8f2
-0x1c8dd4c50ba22dda279f886dbf0bd3ee5b651526
-0xde65e8c956c8a82eae92c056dd3c17a228048f17
-0x5A2Eb500ddc1C142E93617833b59fA623072d601`;
-  }
 
   let addysArr = addysStr.split("\n");
 
@@ -66,47 +58,18 @@ async function getRootFromClaimlist() {
 
     return rootHash;
   }
-
-
 }
 
 async function main() {
   const [deployer] = await ethers.getSigners();
 
-  // Set up the merkle tree
-  /* let addresses = [
-    deployer.address,
-    "0x16ce69f3fe7c52aa0fb25543a0ffd404bfddb8f2",
-    "0x1c8dd4c50ba22dda279f886dbf0bd3ee5b651526",
-    "0xde65e8c956c8a82eae92c056dd3c17a228048f17",
-  ];
-  // Hash addresses to get the leaves
-  let leaves = addresses.map(addr => keccak256(addr))
-  let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
-  let rootHash = merkleTree.getRoot(); */
-
-  const PaymentSplitter = await hre.ethers.getContractFactory("PaymentSplitter");
-  const PaymentSplitter1 = await PaymentSplitter.attach('0xB80d7Ad713333d4C82F04e4CbA7696B6d16ED74b');
-  
-  const BasicTokenDataProvider = await hre.ethers.getContractFactory("BasicTokenDataProvider");
-  const BasicTokenDataProvider1 = await BasicTokenDataProvider.attach('0xf826d7a8DF7702024c798469058Cb726dBAE09c6');
-
   const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
-  const ScuffedFemboys1 = await ScuffedFemboys.attach('0x9288a0cCd754E11b80B15C74fA92C701DE353065');
-
-  //await ScuffedFemboys1.connect(deployer).buy(1, { value: hre.ethers.utils.parseEther("0.05") });
-
-  //await ScuffedFemboys1.connect(deployer).setMintingStatus(true);
-
-  // Set a root
-  /* {
+  const ScuffedFemboys1 = await ScuffedFemboys.attach('0xde65e8C956C8A82eaE92c056Dd3c17A228048F17');
+  
+  {
     //console.log(merkleTree.toString());
     await ScuffedFemboys1.connect(deployer).setClaimRoot(await getRootFromClaimlist()); //rootHash
-  } */
-
-  //await ScuffedFemboys1.connect(deployer).withdrawETH();
-  //await PaymentSplitter1.connect(deployer)['release(address)'](deployer.address);
-  //await ScuffedFemboys1.connect(deployer).buy(1, { value: hre.ethers.utils.parseEther("0.04") });
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -9,13 +9,13 @@ async function main() {
     addysStr = await fs.readFile("./claimlist.txt", "utf-8");
 
     // Test addys
-    {
+    /* {
         addysStr = 
 `0x16ce69f3fe7c52aa0fb25543a0ffd404bfddb8f2
 0x1c8dd4c50ba22dda279f886dbf0bd3ee5b651526
 0xde65e8c956c8a82eae92c056dd3c17a228048f17
 0x5A2Eb500ddc1C142E93617833b59fA623072d601`;
-    }
+    } */
 
     let addysArr = addysStr.split("\n");
 
