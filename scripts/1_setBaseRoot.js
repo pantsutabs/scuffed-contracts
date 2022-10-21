@@ -10,7 +10,7 @@ const keccak256 = require("keccak256")
 const fs = require('fs').promises;
 
 // TODO: copy paste latest one from the merkle script
-async function getRootFromClaimlist() {
+async function getRootFromClaimlistAndSave() {
   let addysStr = '';
   let preppedAddresToProof = { root: null, address: {} };
 
@@ -56,6 +56,14 @@ async function getRootFromClaimlist() {
       preppedAddresToProof.address[addx] = proof;
     });
 
+    await fs.writeFile('./claimMerkleProofs.json', JSON.stringify(preppedAddresToProof), err => {
+      if (err) {
+        console.error(err);
+        throw err;
+      }
+      // file written successfully
+    });
+
     return rootHash;
   }
 }
@@ -64,11 +72,11 @@ async function main() {
   const [deployer] = await ethers.getSigners();
 
   const ScuffedFemboys = await hre.ethers.getContractFactory("ScuffedFemboys");
-  const ScuffedFemboys1 = await ScuffedFemboys.attach('0xde65e8C956C8A82eaE92c056Dd3c17A228048F17');
-  
+  const ScuffedFemboys1 = await ScuffedFemboys.attach('0x6A4912083e8e7B6508D0568EB3eB40A8E681E121');
+
   {
     //console.log(merkleTree.toString());
-    await ScuffedFemboys1.connect(deployer).setClaimRoot(await getRootFromClaimlist()); //rootHash
+    await ScuffedFemboys1.connect(deployer).setClaimRoot(await getRootFromClaimlistAndSave()); //rootHash
   }
 }
 
