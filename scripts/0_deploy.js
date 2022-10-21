@@ -10,9 +10,11 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   
   console.log("Deploying contracts with the account:", deployer.address);
+  // scuffies unoptimized FAIL - 0xde65e8C956C8A82eaE92c056Dd3c17A228048F17
+
   // payment splitter - 0x16cE69F3fE7C52Aa0Fb25543a0fFD404bFDDb8f2
   // token data provider - 0x1C8dD4c50bA22ddA279F886DbF0Bd3Ee5B651526
-  // scuffies - 0xde65e8C956C8A82eaE92c056Dd3c17A228048F17
+  // scuffies - 0x6A4912083e8e7B6508D0568EB3eB40A8E681E121
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
